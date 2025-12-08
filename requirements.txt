@@ -1,0 +1,29 @@
+# Web scraping
+selenium
+webdriver-manager
+seleniumbase
+
+# Data analysis
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+
+# Machine learning / deep learning
+tensorflow
+torch
+torchvision
+torchaudio
+transformers
+ta
+
+# Jupyter / notebooks
+jupyter
+notebook
+ipykernel
+
+# Environment variables
+python-dotenv
+
+textblob

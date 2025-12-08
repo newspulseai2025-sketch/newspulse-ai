@@ -1,0 +1,2 @@
+time_steps,lstm_units,dropout,batch_size,epochs,learning_rate,RMSE,R2
+10,32,0.1,8,50,0.01,614.3204519169442,0.6325564315161577
