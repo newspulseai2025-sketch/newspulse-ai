@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto Indicators Dashboard</title>
+
+<!-- Bootstrap & FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+
+<style>
+body { 
+    background-color: #F0F2F5; 
+    font-family: 'Inter', sans-serif; 
+    padding-top: 20px; 
+}
+
+.dashboard-card { 
+    background-color: #FFFFFF; 
+    border-radius:16px; 
+    box-shadow:0 10px 30px rgba(0,0,0,0.1); 
+    padding:25px 35px; 
+    width: 100%;  
+    max-width: 100%; 
+    margin:0 auto; 
+    overflow-x:auto;   
+}
+
+.dashboard-header { 
+    background-color:#E9ECEF; 
+    padding:15px 35px; 
+    margin:-25px -35px 25px -35px; 
+    border-radius:16px 16px 0 0; 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+}
+
+.text-up { 
+    color:#10B981 !important; 
+    font-weight:600; 
+}
+.text-down { 
+    color:#EF4444 !important; 
+    font-weight:600; 
+}
+
+#indicatorTable { 
+    width: 100% !important; 
+    font-size: 0.80rem;  
+}
+
+.table-responsive {
+    overflow-x: auto; 
+}
+
+#indicatorTable thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+}
+
+#indicatorTable thead th:first-child,
+#indicatorTable tbody td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 2;
+}
+</style>
+</head>
+<body>
+
+   <!-- ================= HEADER NAV BAR ================= -->
+<nav class="navbar navbar-expand-lg top-nav">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="#">Trading Dashboard</a>
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">Crypto</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Commodities</a>
+      </li>
+    </ul>
+  </div>
+</nav> 
+
+
+<div class="container-fluid">
+<div class="dashboard-card">
+
+<div class="dashboard-header">
+    <h2>Crypto Dashboard</h2>
+</div>
+
+<!-- Selectors -->
+<div class="row mb-4 align-items-end">
+    <!-- Coin Selector -->
+    <div class="col-auto">
+        <label for="cryptoSelect" class="form-label">Coin</label>
+        <select id="cryptoSelect" class="form-select form-select-sm">
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="USDT">Tether (USDT)</option>
+            <option value="BNB">Binance Coin (BNB)</option>
+            <option value="ADA">Cardano (ADA)</option>
+            <option value="SOL">Solana (SOL)</option>
+            <option value="XRP">Ripple (XRP)</option>
+            <option value="DOT">Polkadot (DOT)</option>
+            <option value="AVAX">Avalanche (AVAX)</option>
+            <option value="MATIC">Polygon (MATIC)</option>
+            <option value="ATOM">Cosmos (ATOM)</option>
+            <option value="DAI">Dai (DAI)</option>
+            <option value="LTC">Litecoin (LTC)</option>
+            <option value="UNI">Uniswap (UNI)</option>
+            <option value="ALGO">Algorand (ALGO)</option>
+            <option value="BCH">Bitcoin Cash (BCH)</option>
+            <option value="XLM">Stellar (XLM)</option>
+            <option value="XMR">Monero (XMR)</option>
+            <option value="LINK">Chainlink (LINK)</option>
+            <option value="SUI">Sui (SUI)</option>
+            <option value="TON">Toncoin (TON)</option>
+            <option value="TRX">Tron (TRX)</option>
+            <option value="USDE">Ethena USDe (USDE)</option>
+            <option value="HBAR">Hedera (HBAR)</option>
+            <option value="DOGE">Dogecoin (DOGE)</option>
+        </select>
+    </div>
+
+    <!-- Timeframe Selector -->
+    <div class="col-auto">
+        <label for="timeframeSelect" class="form-label">Timeframe</label>
+        <select id="timeframeSelect" class="form-select form-select-sm">
+            <option value="1m">1 Minute</option>
+            <option value="5m">5 Minutes</option>
+            <option value="15m">15 Minutes</option>
+            <option value="30m">30 Minutes</option>
+            <option value="1h">1 Hour</option>
+            <option value="4h">4 Hours</option>
+            <option value="1d">1 Day</option>
+            <option value="1w">1 Week</option>
+            <option value="1M">1 Month</option>
+            <option value="3M">3 Months</option>
+        </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-auto">
+        <button class="btn btn-primary btn-sm px-4" onclick="loadIndicators()">Show Indicators</button>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-success btn-sm px-4" onclick="loadSignal()">Show Signal</button>
+    </div>
+</div>
+
+<!-- Indicators Table -->
+<h4 class="small fw-bold text-muted mt-3 mb-2">Indicators Data</h4>
+<div class="table-responsive">
+<table class="table table-hover display nowrap" id="indicatorTable">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Coin</th>
+            <th>Open</th><th>High</th><th>Low</th><th>Close</th>
+            <th>Volume</th><th>EMA_200</th><th>EMA_50</th><th>EMA_20</th>
+            <th>RSI_14</th><th>ATR</th><th>ATR_pct</th>
+            <th>Vol_Ratio</th><th>MACD</th><th>MACD_signal</th><th>MACD_diff</th>
+            <th>Pair</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td colspan="17" class="text-center text-muted">Select a coin and timeframe, then click "Show Indicators".</td></tr>
+    </tbody>
+</table>
+</div>
+
+<!-- Signal Analysis -->
+<h4 class="small fw-bold text-muted mt-5 mb-2">Signal Analysis</h4>
+<div id="signalBox" class="alert alert-info rounded-3">Select crypto and click "Show Signal".</div>
+
+</div>
+</div>
+
+<!-- jQuery and DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+let dataTable;
+
+function formatPrice(v) {
+    return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function loadIndicators() {
+    const ticker = document.getElementById("cryptoSelect").value;
+    const timeframe = document.getElementById("timeframeSelect").value; // currently UI only
+    const tbody = $("#indicatorTable tbody");
+
+    tbody.html('<tr><td colspan="17" class="text-center text-muted">Loading...</td></tr>');
+
+    try {
+        const res = await fetch(`${API_BASE}/indicators/${ticker}`); // no timeframe used yet
+        const data = await res.json();
+
+        if ($.fn.DataTable.isDataTable('#indicatorTable')) {
+            dataTable.destroy();
+        }
+
+        tbody.html("");
+        if (!data || data.length === 0) {
+            tbody.html('<tr><td colspan="17">No data</td></tr>');
+            return;
+        }
+
+        data.forEach(r => {
+            tbody.append(`<tr>
+<td>${r.Date}</td>
+<td>${r.Coin_Name || r.Ticker}</td>
+<td class="${r.Close >= r.Open ? 'text-up' : 'text-down'}">${formatPrice(r.Open)}</td>
+<td class="text-up">${formatPrice(r.High)}</td>
+<td class="text-down">${formatPrice(r.Low)}</td>
+<td class="${r.Close >= r.Open ? 'text-up' : 'text-down'}">${formatPrice(r.Close)}</td>
+<td>${Number(r.Volume).toLocaleString()}</td>
+<td>${r.EMA_200}</td><td>${r.EMA_50}</td><td>${r.EMA_20}</td>
+<td>${r.RSI_14}</td><td>${r.ATR}</td><td>${r.ATR_pct}</td>
+<td>${r.Vol_Ratio}</td><td>${r.MACD}</td><td>${r.MACD_signal}</td>
+<td class="${r.MACD_diff >= 0 ? 'text-up' : 'text-down'}">${r.MACD_diff}</td>
+<td>${r.Ticker}</td>
+</tr>`);
+        });
+
+        dataTable = $('#indicatorTable').DataTable({
+            "scrollY": "500px",
+            "scrollX": true,
+            "scrollCollapse": true,
+            "paging": false,
+            "pageLength": 10, 
+            "order": [[0, "desc"]],
+            "autoWidth": false,
+            "searching": false
+        });
+
+    } catch (e) {
+        tbody.html('<tr><td colspan="17">Error fetching data</td></tr>');
+        console.error(e);
+    }
+}
+
+async function loadSignal() {
+    const ticker = document.getElementById("cryptoSelect").value;
+    const signalBox = document.getElementById("signalBox");
+
+    signalBox.className = 'alert alert-info rounded-3';
+    signalBox.innerHTML = "Loading signal...";
+
+    try {
+        const res = await fetch(`${API_BASE}/signal/${ticker}`);
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            signalBox.innerHTML = "No signal";
+            return;
+        }
+
+        const s = data[0];
+        let cls;
+        if (s.Signal.toUpperCase() === 'BUY') cls = 'alert-success';
+        else if (s.Signal.toUpperCase() === 'SELL') cls = 'alert-danger';
+        else cls = 'alert-warning';
+
+        signalBox.className = `alert ${cls} rounded-3`;
+        signalBox.innerHTML = `<b>Signal:</b> ${s.Signal}<br>
+<b>Price:</b> ${formatPrice(s.Live_Price)}<br>
+<b>Confidence:</b> ${s.Confidence}`;
+    } catch (e) {
+        signalBox.className = 'alert alert-danger';
+        signalBox.innerHTML = "Error fetching signal";
+        console.error(e);
+    }
+}
+</script>
+
+</body>
+</html>
